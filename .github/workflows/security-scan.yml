@@ -14,13 +14,13 @@ jobs:
           uses: actions/checkout@v3
 
         - name: kubescape security scan
-          uses: kubescape/github-action@v3.0.21
+          uses: kubescape/github-action@v4.0.12
           continue-on-error: true # for dev don't fail build on security errors
           with:
             format: sarif
             outputFile: results
 
         - name: Upload Kubescabe scan results to Github Code Scanning
-          uses: github/codeql-action/upload-sarif@v2
+          uses: github/codeql-action/upload-sarif@v3
           with:
             sarif_file: results.sarif
