@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: inventory-service
+  name: inventory-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: inventory-service
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: postgres:alpine
+        command: ['sh', '-c', 'pg_isready -h inventory-service-db-rw -p 5432']
+      containers:
+      - image: ghcr.io/smikesword/inventory-service:4b2a5b623d8d4380b33851d7cbc1435fa1bc219a
+        name: inventory-service
+        env:
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: inventory-service-db-app
+                key: password
+          - name: SPRING_DATASOURCE_USER
+            valueFrom:
+              secretKeyRef:
+                name: inventory-service-db-app
+                key: username
+          - name: SPRING_DATASOURCE_URL
+            value:  jdbc:postgresql://inventory-service-db-rw:5432/yodb_inventory
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: inventory-service
+  name: inventory-service
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: inventory-service
+status:
+  loadBalancer: {}

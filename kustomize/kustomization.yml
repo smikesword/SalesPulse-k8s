@@ -1,0 +1,3 @@
+resources:
+- inventory-service.yml
+- postgres.yml
