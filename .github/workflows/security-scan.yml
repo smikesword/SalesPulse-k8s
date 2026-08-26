@@ -18,7 +18,7 @@ jobs:
           continue-on-error: true # for dev don't fail build on security errors
           with:
             format: sarif
-            outputFile: results
+            outputFile: results.sarif
 
         - name: Upload Kubescabe scan results to Github Code Scanning
           uses: github/codeql-action/upload-sarif@v3
