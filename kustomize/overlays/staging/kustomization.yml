@@ -1,2 +1,7 @@
 resources:
-  - ../../base
+- ../../base
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: ghcr.io/smikesword/inventory-service
+  newTag: 94edcf9144d24714e09d653360d2d64ed91e1cde
